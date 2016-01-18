@@ -14,7 +14,8 @@
 # | PURPOSE:               
 # |
 # |  1:  Run models varying sample size
-# |  2:  Convert output to a plotable object
+# |  2:  Calculate Summary Statistics for sample size groups
+# |  3:  Convert output to a plotable object
 
 # *------------------------------------------------------------------
 # | COMMENTS AND TODO:               

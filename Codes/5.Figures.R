@@ -11,8 +11,9 @@
 #  Platform: x86_64-w64-mingw32/x64 (64-bit)
 #  Running under: Windows 7 x64 (build 7601) Service Pack 1
 # *----------------------------------------------------------------
-# | PURPOSE:               
+# | PURPOSE:         
 # |
+# |  1: Make Figure for publication
 # *------------------------------------------------------------------
 # | COMMENTS AND TODO:               
 # |
@@ -26,6 +27,8 @@
 # |  PART 1:  1. Variable Importance Plot
 # |  PART 2:  2. RFE Output Plots
 # |  PART 3:  3. Heatscatter
+# |  PART 4:  4. Model Combinations
+# |  PART 5:  5. Sample Size Test
 # *-----------------------------------------------------------------
 # | UPDATES:               
 # |
@@ -61,7 +64,7 @@ stat_sum_single2 <- function(fun, geom="point", ...) {
 
 # 1. Variable Importance Plot  ------------------------------------------------------------
 
-#pdf("VariableImport.pdf")
+pdf("VariableImport.pdf")
 
 ggplot(Variable.importance, aes(x= VariableLabel, y=Overall,fill=classvi))+ 
   geom_bar(stat="identity") + coord_flip() + scale_y_continuous(limits=c(0,70))+
@@ -70,7 +73,7 @@ ggplot(Variable.importance, aes(x= VariableLabel, y=Overall,fill=classvi))+
   geom_rect(aes(xmin = 18 + 0.5, xmax = 11 - 0.5, ymin = 0 , ymax = 70 - 0.5),
             fill = "transparent", color = "black", size = 1,linetype=2)+
   theme(legend.title=element_blank())  
-#dev.off()
+dev.off()
 
 # 2. RFE Output Plots -----------------------------------------------------
 
@@ -97,13 +100,13 @@ plot2 <- ggplot(filter(rfeMetrics,variable=="RMSE"),aes(x = Variables,y = value)
   geom_hline(yintercept=0.09367232*1.05,linetype=2,col= "darkgreen",size=1)+
   scale_y_reverse()
 
-#pdf(file = "new_figs/rfe.pdf",width = 15,height = 12)
-#grid.arrange(plot1, plot2, ncol=1)
-#dev.off()
+pdf(file = "rfe.pdf",width = 15,height = 12)
+grid.arrange(plot1, plot2, ncol=1)
+dev.off()
 
 # 3. Heatscatter ----------------------------------------------------------
 
-#pdf(file = "heatscatter.pdf",width = 8,height = 6)
+pdf(file = "heatscatter.pdf",width = 8,height = 6)
 ggplot(coverValues, aes(x=Predicted, y=Actual)) +
   stat_binhex(bins=75)+
   #scale_fill_gradientn(colours=c("yellow","green","peachpuff","red","darkred","brown"),name = "Frequency",na.value=NA)+
@@ -117,7 +120,7 @@ ggplot(coverValues, aes(x=Predicted, y=Actual)) +
               linetype="dashed", size=1)+ theme_bw()+theme(text = element_text(size=20))+
   #theme(strip.text.x = element_text(size=20,face="bold"),axis.text=element_text(size=20,face="bold"),axis.title=element_text(size=20,face="bold"))+
   labs(x="Predicted Value",y="Actual Value")
-#dev.off()
+dev.off()
 
 # 4. Model Combinations ---------------------------------------------------
 
@@ -139,9 +142,9 @@ plot2.combs<- ggplot(model.test.rmse.forplot,aes(x = Model,y = mn, group=grp))+
   scale_x_discrete(limits = rev(levels(model.test.rmse.forplot$Model)))
 
 
-#pdf(file = "new_figs/models.pdf",width = 15,height = 12)
-#grid.arrange(plot1.combs, plot2.combs, ncol=1)
-#dev.off()
+pdf(file = "models.pdf",width = 15,height = 12)
+grid.arrange(plot1.combs, plot2.combs, ncol=1)
+dev.off()
 
 # 5. Sample Size Test -----------------------------------------------------
 
@@ -169,11 +172,11 @@ plot1.sampsize <- ggplot(filter(sample.runs.melt.forplot,variable=="Rsq"),aes(fa
   xlab("Number of Samples")+
   ylab("RMSE")+
   scale_x_discrete(breaks=seq(500, 30000, 2500))+
-  scale_y_reverse()+
+  scale_y_reverse()
   #geom_hline(yintercept= 0.1024951+7.180483e-06,linetype=2,col= "darkgreen",size=1)
 
 #pdf(file = "samplesize.pdf",width = 15,height = 12)
-#grid.arrange(plot1.sampsize, plot2.sampsize, ncol=1)
+grid.arrange(plot1.sampsize, plot2.sampsize, ncol=1)
 #dev.off()
 
 
