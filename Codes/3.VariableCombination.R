@@ -148,8 +148,6 @@ model.summary.stats <- model.test %>% select(Model, Rsq, RMSE)%>% gather(Metric,
 model.test.r2.aov = aov(Rsq ~ Model, data = model.test[,7:8])
 modl.tes.r2.aov.hsd <- TukeyHSD(model.test.r2.aov)
 
-
-
 # Make Plot-able objects --------------------------------------------------
 
 model.test.r2.forplot <-    model.test %>% select(Model, Rsq) %>% group_by(Model) %>% summarise(mn=mean(Rsq)) %>% arrange(mn)
