@@ -64,18 +64,18 @@ stat_sum_single2 <- function(fun, geom="point", ...) {
 
 # 1. Variable Importance Plot  ------------------------------------------------------------
 
-pdf("VariableImport.pdf")
+pdf("Data/Outputs/5.Figures/VariableImport.pdf")
 
 ggplot(Variable.importance, aes(x= VariableLabel, y=Overall,fill=classvi))+ 
   geom_bar(stat="identity") + coord_flip() + scale_y_continuous(limits=c(0,70))+
   theme_bw() + scale_fill_manual(values=c("darkolivegreen3", "darkolivegreen4", "brown","blue","blue4"))+
   ylab("Scaled Variable Importance")+ xlab("Variable")+
-  geom_rect(aes(xmin = 18 + 0.5, xmax = 11 - 0.5, ymin = 0 , ymax = 70 - 0.5),
+  geom_rect(aes(xmin = 18 + 0.5, xmax = 12 - 0.5, ymin = 0 , ymax = 70 - 0.5),
             fill = "transparent", color = "black", size = 1,linetype=2,show.legend = F)+
   theme(legend.title=element_blank(),legend.justification = c(1, 0),legend.position = c(1, 0))  
 
   
-  dev.off()
+dev.off()
 
 # 2. RFE Output Plots -----------------------------------------------------
 
@@ -108,7 +108,7 @@ dev.off()
 
 # 3. Heatscatter ----------------------------------------------------------
 
-pdf(file = "heatscatter.pdf",width = 8,height = 6)
+pdf(file = "Data/Outputs/5.Figures/heatscatter.pdf",width = 8,height = 6)
 ggplot(coverValues, aes(x=Predicted, y=Actual)) +
   stat_binhex(bins=75)+
   #scale_fill_gradientn(colours=c("yellow","green","peachpuff","red","darkred","brown"),name = "Frequency",na.value=NA)+
@@ -144,7 +144,7 @@ plot2.combs<- ggplot(model.test.rmse.forplot,aes(x = Model,y = mn, group=grp))+
   scale_x_discrete(limits = rev(levels(model.test.rmse.forplot$Model)))
 
 
-pdf(file = "models.pdf",width = 15,height = 12)
+pdf(file = "Data/Outputs/5.Figures/models.pdf",width = 15,height = 12)
 grid.arrange(plot1.combs, plot2.combs, ncol=1)
 dev.off()
 
@@ -177,7 +177,7 @@ plot1.sampsize <- ggplot(filter(sample.runsMelt.FORPLOT,variable=="Rsq"),aes(fac
   scale_y_reverse()
   #geom_hline(yintercept= 0.1024951+7.180483e-06,linetype=2,col= "darkgreen",size=1)
 
-#pdf(file = "samplesize.pdf",width = 15,height = 12)
+#pdf(file = "Data/Outputs/5.Figures/samplesize.pdf",width = 15,height = 12)
 grid.arrange(plot1.sampsize, plot2.sampsize, ncol=1)
 #dev.off()
 

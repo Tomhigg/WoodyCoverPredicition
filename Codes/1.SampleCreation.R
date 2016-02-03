@@ -35,7 +35,7 @@
 # |  PART 4:  Split into Training and Testing Sets
 # *-----------------------------------------------------------------
 # | UPDATES:               
-# |
+# | 03/02/2015- Changes to VI and Palsar processing packages, should be more stable 
 # |
 # |*------------------------------------------------------------------
 # | Packages Used:               
