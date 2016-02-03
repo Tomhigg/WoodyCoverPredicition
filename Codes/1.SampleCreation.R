@@ -21,8 +21,9 @@
 # *------------------------------------------------------------------
 # | COMMENTS AND TODO:               
 # |
-# |  1:  Should copy the Vegetation index functions into zebu package as teamlucc is not maintained so liable to decay
-# |  2:   
+# |  1:   Should copy the Vegetation index functions into zebu package as 
+# |       teamlucc is not maintained so liable to decay - DONE Switched to RSto
+# |  2:   Add palsar backscatter function to zebu - DONE
 # |  3: 
 
 # |*------------------------------------------------------------------
@@ -39,8 +40,9 @@
 # |*------------------------------------------------------------------
 # | Packages Used:               
 library(raster)
+library(rgdal)
+library(RStoolbox)
 library(spatial.tools)
-library(teamlucc)
 library(zebu)
 library(fracCover)
 library(doParallel)
@@ -48,19 +50,22 @@ library(caret)
 
 # |*------------------------------------------------------------------
 # | Data Used: 
-setwd("")
+setwd("D:/Projects_new/woodycovermodels/CodeData/")
 
 #load shapefile of study area
-study.area <- readOGR(dsn = "/shapefiles",layer = "Study_area")
+study.area <- readOGR(dsn = "Data/shapefiles",layer = "StudyArea")
 
 #list of landsat SR bands, recursive as there are two folders (dry and wet)
-Landsat.list  <- list.files(path = "/Input_data/2008/",
+Landsat.list  <- list.files(path = "Data/Imagery/Landsat/",
                             pattern = "sr_band.*.tif$",
                             full.names = TRUE,
                             recursive = TRUE)
 
 #list of PALSAR files
-PALSAR.list  <- list.files(path = "/Input_data/PALSAR/",pattern = "*.tif$",full.names = TRUE)
+PALSAR.list  <- list.files(path = "Data/Imagery/PALSAR/",
+                           pattern = "*.tif$",
+                           full.names = TRUE,
+                           recursive = FALSE)
 
 #list of high-res shrub layers
 shrub.mask.list  <- list.files(path = "/Training_data/NGI_aerial_imagery/shrub_masks/",
@@ -77,16 +82,17 @@ SA_AEAC_CRS  <- "+proj=aea +lat_1=-24 +lat_2=-33 +lat_0=0 +lon_0=24 +x_0=0 +y_0=
 
 # Format Landsat Data  --------------------------------------------
 #wet season Landsat
-Landsat.wet  <- stack(sapply(X = Landsat.list[1:6],FUN = raster))
+Landsat.wet  <- stack(sapply(X = Landsat.list[grep("2008089",Landsat.list)],FUN = raster))
 Landsat.wet  <- crop(x = Landsat.wet,y = study.area)
-msavi.wet  <- MSAVI2(red = (subset(Landsat.wet,subset = 3)*0.0001), nir =(subset(Landsat.wet,subset=4)*0.0001))*10000
-ndvi.wet  <- NDVI(red = (subset(Landsat.wet,subset = 3)*0.0001), nir =(subset(Landsat.wet,subset=4)*0.0001))*10000
+msavi.wet <- spectralIndices(img =Landsat.wet,red = 3,nir = 4,indices = "MSAVI" ,scaleFactor = 0.0001)
+ndvi.wet <- spectralIndices(img =Landsat.wet,red = 3,nir = 4,indices = "NDVI" ,scaleFactor = 0.0001)
 
 #dry season Landsat
-Landsat.dry  <- stack(sapply(X = Landsat.list[7:12],FUN = raster))
-Landsat.dry  <- crop(x = Landsat.dry,y = study_area)
-msavi.dry  <- MSAVI2(red = (subset(Landsat.dry,subset = 3)*0.0001), nir =(subset(Landsat.dry,subset=4)*0.0001))*10000
-ndvi.dry  <- NDVI(red = (subset(Landsat.dry,subset = 3)*0.0001), nir =(subset(Landsat.dry,subset=4)*0.0001))*10000
+Landsat.dry  <- stack(sapply(X = Landsat.list[grep("2008249",Landsat.list)],FUN = raster))
+Landsat.dry  <- crop(x = Landsat.dry,y = study.area)
+msavi.dry <- spectralIndices(img =Landsat.dry,red = 3,nir = 4,indices = "MSAVI" ,scaleFactor = 0.0001)
+ndvi.dry <- spectralIndices(img =Landsat.dry,red = 3,nir = 4,indices = "NDVI" ,scaleFactor = 0.0001)
+
 
 #stack all Landsat variable and rename to "Season_band/VI"
 Landsat  <- stack(Landsat.wet, msavi.wet, ndvi.wet, Landsat.dry, msavi.dry,ndvi.dry)
@@ -107,7 +113,7 @@ palsar.stack  <- PalsarBackscatter(palsar.stack)
 #Name layer according to polarization 
 names(palsar.stack) <- c("HH", "HV")
 
-#join stacks, remote unnessesary files
+#join stacks, remove unnessesary files
 Landsat_palsar  <- stack(Landsat,palsar.stack)
 rm(palsar_stack,Landsat,band_names)
 
