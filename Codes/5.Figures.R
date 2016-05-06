@@ -48,7 +48,7 @@ stat_sum_single <- function(fun, geom="point", ...) {
   stat_summary(fun.y=fun, colour="red", geom=geom, size = 3, ...)
 }
 stat_sum_single2 <- function(fun, geom="point", ...) {
-  stat_summary(fun.y=fun, colour="blueviolet", geom=geom, size = 6,shape= 95, ...)
+  stat_summary(fun.y=fun, colour="blue", geom=geom, size = 7,shape= 95, ...)
 }
 
 
@@ -82,22 +82,22 @@ dev.off()
 plot1<- ggplot(filter(rfeMetrics,variable=="Rsquared"),aes(x = Variables,y = value))+
   geom_line(col="darkgrey",size=1)+
   scale_shape_identity() +
-  stat_sum_single(mean)+
   stat_sum_single2(std_h)+
   stat_sum_single2(std_l)+
+  stat_sum_single(mean)+
   ylab(bquote(~ R^2))+xlab("")+
-  theme_bw()+theme(text = element_text(size=20))+
+  theme_bw(base_size = 22)+
   geom_hline(yintercept=0.65298831,linetype=2,col= "darkgreen",size=1)+
   geom_hline(yintercept=0.65298831*0.95,linetype=2,col= "darkgreen",size=1)
 
 plot2 <- ggplot(filter(rfeMetrics,variable=="RMSE"),aes(x = Variables,y = value))+
   geom_line(col="darkgrey",size=1)+
   scale_shape_identity() +
-  stat_sum_single(mean)+
   stat_sum_single2(std_h)+
   stat_sum_single2(std_l)+
+  stat_sum_single(mean)+
   ylab("RMSE")+xlab("Number of Variables")+
-  theme_bw()+theme(text = element_text(size=20))+
+  theme_bw(base_size = 22)+
   geom_hline(yintercept=0.09367232,linetype=2,col= "darkgreen",size=1)+
   geom_hline(yintercept=0.09367232*1.05,linetype=2,col= "darkgreen",size=1)+
   scale_y_reverse()
@@ -108,20 +108,18 @@ dev.off()
 
 # 3. Heatscatter ----------------------------------------------------------
 
-pdf(file = "Data/Outputs/5.Figures/heatscatter.pdf",width = 8,height = 6)
+pdf(file = "heatscatter.pdf",width = 8,height = 6)
 ggplot(coverValues, aes(x=Predicted, y=Actual)) +
   stat_binhex(bins=75)+
-  #scale_fill_gradientn(colours=c("yellow","green","peachpuff","red","darkred","brown"),name = "Frequency",na.value=NA)+
   scale_fill_gradient(low="bisque", high="magenta4",name = "Frequency",na.value=NA)+
-  #geom_point(size=1, position="jitter",alpha = 0.2) +facet_wrap(~variable)+
-  #scale_colour_hue(l=50) + # Use a slightly darker palette than normal
-  geom_smooth(method="lm")  +  # Don't add shaded confidence region
+  geom_smooth(method="lm")+  
   scale_y_continuous(limits=c(0,1))+
   scale_x_continuous(limits=c(0,1))+
   geom_abline(intercept = 0, slope = 1, color="red", 
-              linetype="dashed", size=1)+ theme_bw()+theme(text = element_text(size=20))+
-  #theme(strip.text.x = element_text(size=20,face="bold"),axis.text=element_text(size=20,face="bold"),axis.title=element_text(size=20,face="bold"))+
-  labs(x="Predicted Value",y="Actual Value")
+              linetype="dashed", size=1)+ 
+  theme_bw(base_size = 22)+
+  labs(x="Predicted Value",y="Actual Value")+
+  guides(fill=guide_legend(title="Count"))
 dev.off()
 
 # 4. Model Combinations ---------------------------------------------------
@@ -131,7 +129,7 @@ plot1.combs<- ggplot(model.test.r2.forplot,aes(x = Model,y = mn, group=grp))+
   geom_hline(yintercept= 0.6470302,linetype=2,col= "darkgreen",size=1)+
   geom_hline(yintercept= 0.6470302*0.95,linetype=2,col= "darkgreen",size=1)+
   ylab(bquote('Adjusted'~ R^2))+xlab("")+
-  theme_bw()+theme(text = element_text(size=20),axis.text.x=element_text(size=12, angle=25,hjust=1),plot.margin= unit(rep(.5, 4), "lines"))
+  theme_bw(base_size = 22)+theme(axis.text.x=element_text(angle=25,hjust=1),plot.margin= unit(rep(.5, 4), "lines"))
 
 
 plot2.combs<- ggplot(model.test.rmse.forplot,aes(x = Model,y = mn, group=grp))+
@@ -139,19 +137,19 @@ plot2.combs<- ggplot(model.test.rmse.forplot,aes(x = Model,y = mn, group=grp))+
   geom_hline(yintercept= 0.09433350,linetype=2,col= "darkgreen",size=1)+
   geom_hline(yintercept= 0.09433350*1.05,linetype=2,col= "darkgreen",size=1)+
   ylab(bquote("RMSE"))+xlab("")+
-  theme_bw()+theme(text = element_text(size=20),axis.text.x=element_text(size=12, angle=25,hjust=1),plot.margin= unit(rep(.5, 4), "lines"))+
+  theme_bw(base_size = 22)+theme(axis.text.x=element_text(angle=25,hjust=1),plot.margin= unit(rep(.5, 4), "lines"))+
   scale_y_reverse()+
   scale_x_discrete(limits = rev(levels(model.test.rmse.forplot$Model)))
 
 
-pdf(file = "Data/Outputs/5.Figures/models.pdf",width = 15,height = 12)
+pdf(file = "models.pdf",width = 15,height = 12)
 grid.arrange(plot1.combs, plot2.combs, ncol=1)
 dev.off()
 
 # 5. Sample Size Test -----------------------------------------------------
 
 
-plot1.sampsize <- ggplot(filter(sample.runsMelt.FORPLOT,variable=="Rsq"),aes(factor(Sample.No),y = value))+
+plot1.sampsize <- ggplot(filter(sample.runs.all,variable=="Rsq"),aes(factor(Sample.No),y = value))+
   geom_line(col="darkgrey",size=1)+
   scale_shape_identity() +
   stat_sum_single(mean)+
@@ -164,7 +162,7 @@ plot1.sampsize <- ggplot(filter(sample.runsMelt.FORPLOT,variable=="Rsq"),aes(fac
   #geom_hline(yintercept=0.5834400+7.180483e-06,linetype=2,col= "darkgreen",size=1)
   
   
-  plot2.sampsize <- ggplot(filter(sample.runsMelt.FORPLOT,variable=="RMSE"),aes(factor(Sample.No),y = value))+
+  plot2.sampsize <- ggplot(filter(sample.runs.all,variable=="RMSE"),aes(factor(Sample.No),y = value))+
   geom_line(col="darkgrey",size=1)+
   scale_shape_identity() +
   stat_sum_single(mean)+
@@ -177,8 +175,8 @@ plot1.sampsize <- ggplot(filter(sample.runsMelt.FORPLOT,variable=="Rsq"),aes(fac
   scale_y_reverse()
   #geom_hline(yintercept= 0.1024951+7.180483e-06,linetype=2,col= "darkgreen",size=1)
 
-#pdf(file = "Data/Outputs/5.Figures/samplesize.pdf",width = 15,height = 12)
+#pdf(file = "D:/Projects_new/woodycovermodels/CodeData/Data/Outputs/5.Figures/samplesize.pdf",width = 15,height = 12)
 grid.arrange(plot1.sampsize, plot2.sampsize, ncol=1)
-#dev.off()
+dev.off()
 
 
